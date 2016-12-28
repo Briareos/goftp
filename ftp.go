@@ -372,7 +372,10 @@ func (ftp *FTP) newConnection(port int) (conn net.Conn, err error) {
 	}
 
 	if ftp.tlsconfig != nil {
-		conn = tls.Client(conn, ftp.tlsconfig)
+		tlsConn := tls.Client(conn, ftp.tlsconfig)
+		// Force the handshake so empty files also open a data connection
+		tlsConn.Handshake()
+		conn = tlsConn
 	}
 
 	return
